@@ -6,19 +6,19 @@ import recordRoutes from "./routes/record.route.js"
 import userRoutes from "./routes/user.route.js"
 import cookieParser from "cookie-parser";
 
-const app=express();
+const app = express();
 dotenv.config()
 
 app.use(express.json())
 app.use(cookieParser())
 
-app.use("/api/auth",authRoutes)
-app.use("/api/user",userRoutes)
-app.use("/api/record",recordRoutes)
+app.use("/api/auth", authRoutes)
+app.use("/api/user", userRoutes)
+app.use("/api/record", recordRoutes)
 
-const PORT=process.env.PORT || 5000
+const PORT = process.env.PORT || 5000
 
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
     connectDB()
     console.log(`Server is running on ${PORT}`)
 })

@@ -1,34 +1,34 @@
 import mongoose from "mongoose"
 
-const recordSchema=new mongoose.Schema({
-    userId:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
+const recordSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
-    amount:{
-        type:Number,
-        required:true
+    amount: {
+        type: Number,
+        required: true
     },
-    type:{
-        type:String,
-        enum:["income","expense"],
-        required:true
+    type: {
+        type: String,
+        enum: ["income", "expense"],
+        required: true
     },
-    category:{
-        type:String,
-        required:true
+    category: {
+        type: String,
+        required: true
     },
-    date:{
-        type:Date,
-        default:Date.now
+    date: {
+        type: Date,
+        default: Date.now
     },
-    notes:{
-        type:String
+    notes: {
+        type: String
     }
 },
-{timestamps:true}
+    { timestamps: true }
 )
 
-const Record=mongoose.model("Record",recordSchema)
+const Record = mongoose.model("Record", recordSchema)
 export default Record

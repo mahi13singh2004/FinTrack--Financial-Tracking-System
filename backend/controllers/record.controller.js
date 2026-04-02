@@ -150,3 +150,82 @@ export const getMonthlyTrend = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" })
     }
 }
+
+export const getRecentActivity = async (req, res) => {
+    try {
+        const { limit = 10 } = req.query
+
+        const recentRecords = await Record.find({ userId: req.user._id })
+            .sort({ createdAt: -1 })
+            .limit(parseInt(limit))
+            .select('amount type category date notes createdAt')
+
+        const activitySummary = {
+            totalRecords: recentRecords.length,
+            recentIncome: recentRecords.filter(r => r.type === 'income').reduce((sum, r) => sum + r.amount, 0),
+            recentExpenses: recentRecords.filter(r => r.type === 'expense').reduce((sum, r) => sum + r.amount, 0)
+        }
+
+        return res.status(200).json({
+            message: "Recent activity fetched successfully",
+            recentRecords,
+            summary: activitySummary
+        })
+    }
+    catch (error) {
+        console.log("Error in getRecentActivity controller", error.message)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+export const getWeeklyTrends = async (req, res) => {
+    try {
+        const records = await Record.find({ userId: req.user._id })
+        const weeklyTrends = {}
+
+        records.forEach((r) => {
+            const date = new Date(r.date)
+            const year = date.getFullYear()
+            const week = getWeekNumber(date)
+            const weekKey = `${year}-W${week.toString().padStart(2, '0')}`
+
+            if (!weeklyTrends[weekKey]) {
+                weeklyTrends[weekKey] = {
+                    income: 0,
+                    expense: 0,
+                    total: 0,
+                    count: 0
+                }
+            }
+
+            if (r.type === 'income') {
+                weeklyTrends[weekKey].income += r.amount
+            } else {
+                weeklyTrends[weekKey].expense += r.amount
+            }
+
+            weeklyTrends[weekKey].total += r.amount
+            weeklyTrends[weekKey].count += 1
+        })
+
+        const sortedWeeks = Object.keys(weeklyTrends).sort().reduce((acc, key) => {
+            acc[key] = weeklyTrends[key]
+            return acc
+        }, {})
+
+        return res.status(200).json({
+            message: "Weekly trends received",
+            weeklyTrends: sortedWeeks
+        })
+    }
+    catch (error) {
+        console.log("Error in getWeeklyTrends controller", error.message)
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+function getWeekNumber(date) {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1)
+    const pastDaysOfYear = (date - firstDayOfYear) / 86400000
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7)
+}
