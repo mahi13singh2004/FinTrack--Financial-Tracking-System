@@ -125,18 +125,19 @@ export const refreshToken = async (req, res) => {
         }
 
         const { accessToken, refreshToken: newRefreshToken } = generateTokens(user._id)
+        const isProduction = process.env.NODE_ENV === 'production'
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "strict",
             maxAge: 15 * 60 * 1000
         })
 
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
-            secure: false,
-            sameSite: "strict",
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 

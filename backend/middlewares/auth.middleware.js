@@ -21,18 +21,19 @@ const protectRoute = async (req, res, next) => {
                 try {
                     const refreshDecoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET)
                     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = generateTokens(refreshDecoded.id)
+                    const isProduction = process.env.NODE_ENV === 'production'
 
                     res.cookie("accessToken", newAccessToken, {
                         httpOnly: true,
-                        secure: false,
-                        sameSite: "strict",
+                        secure: isProduction,
+                        sameSite: isProduction ? "none" : "strict",
                         maxAge: 15 * 60 * 1000
                     })
 
                     res.cookie("refreshToken", newRefreshToken, {
                         httpOnly: true,
-                        secure: false,
-                        sameSite: "strict",
+                        secure: isProduction,
+                        sameSite: isProduction ? "none" : "strict",
                         maxAge: 7 * 24 * 60 * 60 * 1000
                     })
 
