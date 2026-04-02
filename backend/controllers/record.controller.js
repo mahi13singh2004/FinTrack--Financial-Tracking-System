@@ -85,3 +85,68 @@ export const updateRecord=async(req,res)=>{
         return res.status(500).json({message:"Internal server error"})
     }
 }
+
+export const getSummary=async(req,res)=>{
+    try {
+        const records=await Record.find()
+        let income=0
+        let expense=0
+
+        records.forEach((r)=>{
+            if(r.type==="income") income+=r.amount
+            else expense+=r.amount
+        })
+
+        return res.status(200).json({
+            message:"Summary formed",
+            totalIncome:income,
+            totalExpense:expense,
+            netBalance:income-expense
+        })
+    } 
+    catch (error) {
+        console.log("Error in backend getSummary controller",error.message)
+        return res.status(500).json({message:"Internal server error"}) 
+    }
+}
+
+export const getCategoryBreakdown=async(req,res)=>{
+    try {
+        const records=await Record.find()
+        const res={}
+        records.forEach((r)=>{
+            if(!res[r.category]) result[r.category]=0
+            else result[r.category]+=r.amount
+        })
+
+        return res.status(200).json({
+            message:"Breakdown achieved",
+            res
+        })
+    } 
+    catch (error) {
+        console.log("Error in backend getCategoryBreakdown controller",error.message)
+        return res.status(500).json({message:"Internal server error"}) 
+    }
+}
+
+export const getMonthlyTrend=async(req,res)=>{
+    try {
+        const records=await Record.find()
+        const trends={}
+        records.forEach((r)=>{
+            const month =r.date.toISOString().slice(0,7);
+            if(!trends[month]) trends[month]=0
+            trends[month]+=r.amount
+        })
+
+        return res.status(200).json({
+            message:"Monthly trends recieved",
+            trends
+        })
+    } 
+    catch (error) {
+        console.log("Error in backend getMonthlyTrend controller",error.message)
+        return res.status(500).json({message:"Internal server error"}) 
+    }
+}
