@@ -1,4 +1,4 @@
-# Finance Dashboard Backend
+# FinTrack- Finance Dashboard
 
 A backend system for managing financial records with role-based access control, JWT authentication, and rate limiting.
 
